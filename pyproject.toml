@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "htf-core"
-version = "1.0.0"
+name = "harmonized-telemetry-format"
+version = "0.0.1a1"
 authors = [
     { name="Max Schlosser", email="schlosse@hs-mittweida.de" },
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Topic :: Scientific/Engineering :: Data Analysis",
+    "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Utilities",
 ]
 
@@ -25,5 +25,4 @@ classifiers = [
 "Bug Tracker" = "https://github.com/Schloool/harmonized-telemetry-format/issues"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
 packages = ["htf_core"]
