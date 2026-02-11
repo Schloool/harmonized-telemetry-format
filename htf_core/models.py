@@ -4,8 +4,8 @@ from typing import Optional
 class HarmonizedTelemetryChannel:
     """A telemetry channel used within a recording."""
 
-    def __init__(self, name: str, unit: str, frequency: Optional[int],
-                 total_values: int, values: list[tuple[[int, object]]]):
+    def __init__(self, name: str, unit: Optional[str], frequency: Optional[int],
+                 total_values: int, values: list[tuple[int, object]]):
         self.name = name
         self.unit = unit
         self.frequency = frequency
