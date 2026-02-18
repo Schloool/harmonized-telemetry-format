@@ -79,37 +79,50 @@ class HtfReader:
             column_values=column_values,
         )
 
-    @staticmethod
-    def read_telemetry_channel(line: str) -> HarmonizedTelemetryChannel:
-        match = CHANNEL_REGEX.match(line)
-        if not match:
-            raise ValueError(f"Line does not match channel format: {line}")
 
-        name = match.group("name")
-        unit = match.group("unit")
-        frequency_str = match.group("frequency")
-        frequency = int(frequency_str) if frequency_str else None
-        total_values = int(match.group("value_count"))
-        data_content = match.group("data_content")
+def read_telemetry_channel_with_all_values(line: str) -> HarmonizedTelemetryChannel:
+    match = CHANNEL_REGEX.match(line)
+    if not match:
+        raise ValueError(f"Line does not match channel format: {line}")
 
-        values = []
-        if data_content:
-            value_pairs = data_content.split(";")
-            for pair in value_pairs:
-                index_str, value_str = pair.split("=", 1)
-                index = int(index_str)
-                value = ast.literal_eval(value_str) if value_str else None
+    name = match.group("name")
+    unit = match.group("unit")
+    frequency_str = match.group("frequency")
+    frequency = int(frequency_str) if frequency_str else None
+    total_values = int(match.group("value_count"))
+    data_content = match.group("data_content")
 
-                # Omit duplicate consecutive values
-                if index > 0 and value == values[-1][1]:
-                    continue
+    values = []
+    if data_content:
+        # Split and filter out empty strings from trailing semicolons
+        value_pairs = [p for p in data_content.split(";") if p]
 
-                values.append((index, value))
+        last_index = -1
+        last_value = None
 
-        return HarmonizedTelemetryChannel(
-            name=name,
-            unit=unit,
-            frequency=frequency,
-            total_values=total_values,
-            values=values
-        )
+        for pair in value_pairs:
+            index_str, value_str = pair.split("=", 1)
+            current_index = int(index_str)
+            current_value = ast.literal_eval(value_str) if value_str else None
+
+            # Fill the gap between the last recorded index and this one
+            # using the previous value (Forward Fill)
+            for gap_index in range(last_index + 1, current_index):
+                values.append((gap_index, last_value))
+
+            values.append((current_index, current_value))
+
+            last_index = current_index
+            last_value = current_value
+
+        # Fill up to last index if there are trailing missing values
+        for gap_index in range(last_index + 1, total_values):
+            values.append((gap_index, last_value))
+
+    return HarmonizedTelemetryChannel(
+        name=name,
+        unit=unit,
+        frequency=frequency,
+        total_values=total_values,
+        values=values
+    )

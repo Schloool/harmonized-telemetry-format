@@ -49,10 +49,11 @@ class HtfWriter:
         frequency = channel.frequency if channel.frequency is not None else ""
         preamble = f"({channel.name};{channel.unit};{frequency};{channel.total_values})"
 
-        # Create index-value pairs, omitting repeating values
-        value_pairs = [f"{index}={value}"
-                       for index, value in channel.values
-                       if index == 0 or value != channel.values[index - 1]]
+        value_pairs = []
+        for i, (ts_index, value) in enumerate(channel.values):
+            # Check if it's the first element OR if value changed from the previous tuple
+            if i == 0 or value != channel.values[i - 1][1]:
+                value_pairs.append(f"{ts_index}={value}")
 
         values = ";".join(value_pairs)
         return f"{preamble}{values}"
