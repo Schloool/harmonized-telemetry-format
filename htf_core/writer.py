@@ -53,7 +53,7 @@ class HtfWriter:
         for i, (ts_index, value) in enumerate(channel.values):
             # Check if it's the first element OR if value changed from the previous tuple
             if i == 0 or value != channel.values[i - 1][1]:
-                value_pairs.append(f"{ts_index}={value}")
+                value_pairs.append(f"{ts_index}={value if value is not None else 'NULL'}")
 
         values = ";".join(value_pairs)
         return f"{preamble}{values}"
