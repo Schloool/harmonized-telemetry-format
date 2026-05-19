@@ -55,6 +55,10 @@ class HtfReader:
         )
 
     @staticmethod
+    def read_telemetry_channel(line: str) -> HarmonizedTelemetryChannel:
+        return read_telemetry_channel_with_all_values(line)
+
+    @staticmethod
     def read_metadata_entry(line: str) -> HarmonizedMetadataEntry:
         match = METADATA_REGEX.match(line)
         if not match:
@@ -65,7 +69,14 @@ class HtfReader:
 
         parts = preamble_content.split(";")
         name = parts[0]
-        column_names = parts[1:]
+        column_names = [c for c in parts[1:] if c]
+
+        if not column_names:
+            return HarmonizedMetadataEntry(
+                name=name,
+                column_names=[],
+                column_values={name: data_content.split(";")},
+            )
 
         column_values = {col_name: [] for col_name in column_names}
         data_values = data_content.split(";")

@@ -19,12 +19,11 @@ class HarmonizedMetadataEntry:
     Maps directly to the HTF line structure: [name;property_1;property_2;...]value1_1;value1_2;value2_1;value2_2;...
     """
 
-    # TODO: Values are wrong
     def __init__(self, name: str, column_names: list[str], column_values: dict[str, list[object]]):
         self.name = name
-        self.column_names = column_names
+        self.column_names = column_names if column_names else [name]
         self.column_values = column_values
-        self._n = len(column_names)
+        self._n = len(self.column_names)
 
     @property
     def is_static(self) -> bool:
